@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>MiBible Quiz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #1f2f26;
+  color: #d4af37;
+  text-align: center;
+  padding: 20px;
+}
+.card {
+  background: #243a2f;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 420px;
+  margin: auto;
+}
+input, select, button {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 5px;
+  border: none;
+}
+button {
+  background: #d4af37;
+  color: #1f2f26;
+  font-weight: bold;
+  cursor: pointer;
+}
+.opcao {
+  background: #2e4a3c;
+  color: white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card" id="setup">
+  <h2>📖 MiBible Quiz</h2>
+
+  <select id="nivel">
+    <option>Novato</option>
+    <option>Diacono</option>
+    <option>Pastor</option>
+    <option>Profeta</option>
+  </select>
+
+  <input placeholder="Jogador 1" id="p1">
+  <input placeholder="Jogador 2 (opcional)" id="p2">
+  <input placeholder="Jogador 3 (opcional)" id="p3">
+  <input placeholder="Jogador 4 (opcional)" id="p4">
+
+  <button onclick="iniciar()">Iniciar Jogo</button>
+</div>
+
+<div class="card" id="game" style="display:none;">
+  <h3 id="turno"></h3>
+  <p id="pergunta"></p>
+  <div id="opcoes"></div>
+</div>
+
+<script>
+// ===== BANCO DE PERGUNTAS =====
+const bancoPerguntas = {
+  Novato: [
+    {q:"Quem construiu a arca?", o:["Moisés","Noé","Abraão","Davi"], r:"Noé"},
+    {q:"Onde Jesus nasceu?", o:["Belém","Jerusalém","Nazaré","Galileia"], r:"Belém"},
+    {q:"Quem foi o primeiro homem?", o:["Adão","Noé","Abraão","Moisés"], r:"Adão"}
+  ],
+  Diacono: [
+    {q:"Quem liderou Israel após Moisés?", o:["Josué","Samuel","Arão","Calebe"], r:"Josué"},
+    {q:"Quem interpretou sonhos no Egito?", o:["José","Daniel","Moisés","Jacó"], r:"José"}
+  ],
+  Pastor: [
+    {q:"Quem reconstruiu os muros de Jerusalém?", o:["Neemias","Esdras","Elias","Ageu"], r:"Neemias"},
+    {q:"Quem escreveu a maioria das cartas do NT?", o:["Paulo","Pedro","João","Lucas"], r:"Paulo"}
+  ],
+  Profeta: [
+    {q:"Qual profeta confrontou o rei Acabe?", o:["Elias","Isaías","Jeremias","Ezequiel"], r:"Elias"},
+    {q:"Quem teve a visão do vale de ossos secos?", o:["Ezequiel","Daniel","Oséias","Amós"], r:"Ezequiel"}
+  ]
+};
+
+// ===== VARIÁVEIS =====
+let jogadores = [];
+let pontos = {};
+let jogadorAtual = 0;
+let perguntas = [];
+let nivelEscolhido = "";
+
+// ===== INICIAR =====
+function iniciar() {
+  nivelEscolhido = nivel.value;
+  jogadores = [p1.value, p2.value, p3.value, p4.value].filter(n => n.trim() !== "");
+  if (jogadores.length === 0) {
+    alert("Insira pelo menos um jogador");
+    return;
+  }
+  jogadores.forEach(j => pontos[j] = 0);
+  perguntas = [...bancoPerguntas[nivelEscolhido]];
+  setup.style.display = "none";
+  game.style.display = "block";
+  proximaPergunta();
+}
+
+// ===== PRÓXIMA PERGUNTA =====
+function proximaPergunta() {
+  if (perguntas.length === 0) {
+    let resultado = "🏆 Fim do jogo!\n\n";
+    jogadores.forEach(j => resultado += `${j}: ${pontos[j]} pontos\n`);
+    alert(resultado);
+    location.reload();
+    return;
+  }
+
+  const p = perguntas.shift();
+  turno.innerText = "Vez de: " + jogadores[jogadorAtual];
+  pergunta.innerText = p.q;
+  opcoes.innerHTML = "";
+
+  p.o.forEach(op => {
+    const btn = document.createElement("button");
+    btn.className = "opcao";
+    btn.innerText = op;
+    btn.onclick = () => {
+      if (op === p.r) pontos[jogadores[jogadorAtual]]++;
+      jogadorAtual = (jogadorAtual + 1) % jogadores.length;
+      proximaPergunta();
+    };
+    opcoes.appendChild(btn);
+  });
+}
+</script>
+
+</body>
+</html>
