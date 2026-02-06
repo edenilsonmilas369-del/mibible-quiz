@@ -8,4 +8,4 @@ As perguntas são organizadas por níveis de dificuldade:
 
 🎮 Simples • 📱 Responsivo • 🌐 Online • 🧠 Educativo
 
-🔗 Jogue online: https://SEU-USUARIO.github.io/mibible-quiz
+🔗 Jogue online: https://EdenilsonMilas.github.io/mibible-quiz
