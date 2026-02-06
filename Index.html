@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MiBible Quiz</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #1f2a24;
+      color: #f5d27a;
+    }
+    header {
+      background: #16201b;
+      padding: 10px;
+      text-align: center;
+      border-bottom: 2px solid #c9a23f;
+    }
+    header h1 {
+      margin: 5px 0;
+      font-size: 20px;
+    }
+    #ranking {
+      font-size: 14px;
+    }
+    .container {
+      padding: 15px;
+    }
+    .card {
+      background: #23332b;
+      border: 1px solid #c9a23f;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      background: #c9a23f;
+      color: #1f2a24;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: none;
+    }
+    .option {
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📖 MiBible Quiz</h1>
+  <div id="ranking">Ranking: —</div>
+</header>
+
+<div class="container">
+
+  <div class="card" id="setup">
+    <h3>Configuração do Jogo</h3>
+    <label>Número de jogadores (1 a 4)</label>
+    <select id="numPlayers">
+      <option>1</option>
+      <option>2</option>
+      <option>3</option>
+      <option>4</option>
+    </select>
+    <button onclick="startSetup()">Continuar</button>
+  </div>
+
+  <div class="card" id="players" style="display:none"></div>
+
+  <div class="card" id="quiz" style="display:none"></div>
+
+</div>
+
+<script>
+const questions = [
+  {q:"Quem construiu a arca?", a:["Moisés","Noé","Abraão","Davi"], c:1},
+  {q:"Quantos livros tem a Bíblia?", a:["39","66","72","60"], c:1},
+  {q:"Quem derrotou Golias?", a:["Saul","Sansão","Davi","Josué"], c:2},
+  {q:"Primeiro livro da Bíblia?", a:["Êxodo","Gênesis","Levítico","Salmos"], c:1},
+  {q:"Quem foi lançado na cova dos leões?", a:["José","Daniel","Elias","Paulo"], c:1},
+  {q:"Quem abriu o Mar Vermelho?", a:["Josué","Abraão","Moisés","Noé"], c:2},
+  {q:"Quantos discípulos tinha Jesus?", a:["10","11","12","13"], c:2},
+  {q:"Onde Jesus nasceu?", a:["Nazaré","Belém","Jerusalém","Galileia"], c:1},
+  {q:"Quem traiu Jesus?", a:["Pedro","João","Judas","Tomé"], c:2},
+  {q:"Último livro da Bíblia?", a:["Judas","Apocalipse","Romanos","Hebreus"], c:1}
+];
+
+let players = [];
+let scores = [];
+let currentPlayer = 0;
+let currentQuestion = 0;
+
+function startSetup(){
+  const n = parseInt(document.getElementById("numPlayers").value);
+  const div = document.getElementById("players");
+  div.innerHTML = "<h3>Nomes dos Jogadores</h3>";
+  for(let i=0;i<n;i++){
+    div.innerHTML += `<input placeholder="Jogador ${i+1}" id="p${i}">`;
+  }
+  div.innerHTML += `<button onclick="startGame(${n})">Iniciar Jogo</button>`;
+  document.getElementById("setup").style.display="none";
+  div.style.display="block";
+}
+
+function startGame(n){
+  for(let i=0;i<n;i++){
+    players.push(document.getElementById("p"+i).value || "Jogador "+(i+1));
+    scores.push(0);
+  }
+  document.getElementById("players").style.display="none";
+  document.getElementById("quiz").style.display="block";
+  updateRanking();
+  showQuestion();
+}
+
+function showQuestion(){
+  if(currentQuestion >= questions.length){
+    document.getElementById("quiz").innerHTML = "<h3>🎉 Fim do Jogo!</h3>";
+    return;
+  }
+  const q = questions[currentQuestion];
+  let html = `<h3>${players[currentPlayer]}, sua vez!</h3>`;
+  html += `<p>${q.q}</p>`;
+  q.a.forEach((opt,i)=>{
+    html += `<button class="option" onclick="answer(${i})">${opt}</button>`;
+  });
+  document.getElementById("quiz").innerHTML = html;
+}
+
+function answer(i){
+  if(i === questions[currentQuestion].c){
+    scores[currentPlayer]++;
+  }
+  currentPlayer = (currentPlayer + 1) % players.length;
+  currentQuestion++;
+  updateRanking();
+  showQuestion();
+}
+
+function updateRanking(){
+  let rank = players.map((p,i)=>`${p}: ${scores[i]}`).join(" | ");
+  document.getElementById("ranking").innerText = "Ranking: " + rank;
+}
+</script>
+
+</body>
+</html>
